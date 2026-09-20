@@ -1,11 +1,11 @@
 const express = require('express');
-const { validateNumericId } = require('../../middlewares/validate-id');
+// const { validateNumericId } = require('../../middlewares/validate-id');
 const controller = require('../controllers/users.controller');
 
 const router = express.Router();
 
-// Valida el parámetro :id (entero positivo) antes de llegar al controlador
-router.param('id', validateNumericId);
+// Comenta la validación si aún no existe el archivo middleware
+// router.param('id', validateNumericId);
 
 /* POST users - crear */
 router.post('/', controller.create);
