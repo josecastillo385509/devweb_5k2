@@ -1,87 +1,45 @@
-const mockCustomers = [
-  {
-    _id: '64b1f8e2c9a1d2e3f4a5b6c1',
-    userId: 101,
-    phone: '+526141234567',
-    email: 'cliente1@stride.com',
-    addresses: [
-      {
-        type: 'shipping',
-        street: 'Av. Universidad',
-        number: '1234',
-        city: 'Chihuahua',
-        state: 'Chihuahua',
-        postalCode: '31000',
-        country: 'México'
-      }
-    ],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  }
-];
+// Controlador de customers (respuestas mock: aún sin base de datos)
 
-const getAllCustomers = (req, res) => {
-  res.status(200).json({
-    message: 'GET customers',
-    data: mockCustomers
-  });
-};
-
-const getCustomerById = (req, res) => {
-  const { id } = req.params;
-  const customer = mockCustomers.find((c) => c._id === id);
-
-  if (!customer) {
-    return res.status(404).json({
-      message: 'Cliente no encontrado',
-      data: null
-    });
-  }
-
-  res.status(200).json({
-    message: `GET customer ${id}`,
-    data: customer
-  });
-};
-
-const createCustomer = (req, res) => {
-  const newCustomer = {
-    _id: '64b1f8e2c9a1d2e3f4a5b6c2',
-    ...req.body,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  };
-
+// CREATE
+function create(req, res) {
   res.status(201).json({
-    message: 'POST customer',
-    data: newCustomer
+    message: 'Customer created successfully',
+    data: {},
   });
-};
+}
 
-const updateCustomer = (req, res) => {
+// READ
+function list(req, res) {
+  res.status(200).json({
+    message: 'Customers list retrieved successfully',
+    data: [],
+  });
+}
+
+function find(req, res) {
   const { id } = req.params;
   res.status(200).json({
-    message: `PUT customer ${id}`,
-    data: {
-      _id: id,
-      ...req.body,
-      updatedAt: new Date().toISOString()
-    }
+    message: `Customer ${id} retrieved successfully`,
+    data: {},
   });
-};
+}
 
-const deleteCustomer = (req, res) => {
+// UPDATE
+function update(req, res) {
   const { id } = req.params;
   res.status(200).json({
-    message: `DELETE customer ${id}`,
-    data: { _id: id }
+    message: `Customer ${id} updated successfully`,
+    data: {},
   });
-};
+}
 
-module.exports = {
-  getAllCustomers,
-  getCustomerById,
-  createCustomer,
-  updateCustomer,
-  deleteCustomer
-};
+// DELETE
+function destroy(req, res) {
+  const { id } = req.params;
+  res.status(200).json({
+    message: `Customer ${id} deleted successfully`,
+    data: {},
+  });
+}
+
+module.exports = { create, list, find, update, destroy };

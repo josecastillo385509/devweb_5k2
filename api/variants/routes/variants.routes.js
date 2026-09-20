@@ -1,11 +1,25 @@
 const express = require('express');
-const router = express.Router();
-const variantsController = require('../controllers/variants.controller');
+const { validateNumericId } = require('../../middlewares/validate-id');
+const controller = require('../controllers/variants.controller');
 
-router.get('/', variantsController.getAllVariants);
-router.get('/:id', variantsController.getVariantById);
-router.post('/', variantsController.createVariant);
-router.put('/:id', variantsController.updateVariant);
-router.delete('/:id', variantsController.deleteVariant);
+const router = express.Router();
+
+// Valida el parámetro :id (entero positivo) antes de llegar al controlador
+router.param('id', validateNumericId);
+
+/* POST variants - crear */
+router.post('/', controller.create);
+
+/* GET variants - listar */
+router.get('/', controller.list);
+
+/* GET variants/:id - obtener uno */
+router.get('/:id', controller.find);
+
+/* PUT variants/:id - actualizar */
+router.put('/:id', controller.update);
+
+/* DELETE variants/:id - eliminar */
+router.delete('/:id', controller.destroy);
 
 module.exports = router;

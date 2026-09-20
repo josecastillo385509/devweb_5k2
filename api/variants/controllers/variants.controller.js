@@ -1,82 +1,45 @@
-const mockVariants = [
-  {
-    id: 1,
-    product_id: 10,
-    sku: 'STRIDE-BLK-42',
-    size: '42',
-    color: 'Negro',
-    active: true
-  },
-  {
-    id: 2,
-    product_id: 10,
-    sku: 'STRkIDE-WHT-40',
-    size: '40',
-    color: 'Blanco',
-    active: true
-  }
-];
+// Controlador de variants (respuestas mock: aún sin base de datos)
 
-const getAllVariants = (req, res) => {
-  res.status(200).json({
-    message: 'GET variants',
-    data: mockVariants
-  });
-};
-
-const getVariantById = (req, res) => {
-  const { id } = req.params;
-  const variant = mockVariants.find((v) => v.id === parseInt(id, 10));
-
-  if (!variant) {
-    return res.status(404).json({
-      message: 'Variante no encontrada',
-      data: null
-    });
-  }
-
-  res.status(200).json({
-    message: `GET variant ${id}`,
-    data: variant
-  });
-};
-
-const createVariant = (req, res) => {
-  const newVariant = {
-    id: mockVariants.length + 1,
-    ...req.body,
-    active: true
-  };
-
+// CREATE
+function create(req, res) {
   res.status(201).json({
-    message: 'POST variant',
-    data: newVariant
+    message: 'Variant created successfully',
+    data: {},
   });
-};
+}
 
-const updateVariant = (req, res) => {
+// READ
+function list(req, res) {
+  res.status(200).json({
+    message: 'Variants list retrieved successfully',
+    data: [],
+  });
+}
+
+function find(req, res) {
   const { id } = req.params;
   res.status(200).json({
-    message: `PUT variant ${id}`,
-    data: {
-      id: parseInt(id, 10),
-      ...req.body
-    }
+    message: `Variant ${id} retrieved successfully`,
+    data: {},
   });
-};
+}
 
-const deleteVariant = (req, res) => {
+// UPDATE
+function update(req, res) {
   const { id } = req.params;
   res.status(200).json({
-    message: `DELETE variant ${id}`,
-    data: { id: parseInt(id, 10) }
+    message: `Variant ${id} updated successfully`,
+    data: {},
   });
-};
+}
 
-module.exports = {
-  getAllVariants,
-  getVariantById,
-  createVariant,
-  updateVariant,
-  deleteVariant
-};
+// DELETE
+function destroy(req, res) {
+  const { id } = req.params;
+  res.status(200).json({
+    message: `Variant ${id} deleted successfully`,
+    data: {},
+  });
+}
+
+module.exports = { create, list, find, update, destroy };
