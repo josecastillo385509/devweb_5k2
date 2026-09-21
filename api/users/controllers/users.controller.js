@@ -1,45 +1,40 @@
-// Controlador de users (respuestas mock: aún sin base de datos)
-
 // CREATE
 function create(req, res) {
-  res.status(201).json({
-    message: 'User created successfully',
-    data: {},
-  });
+    res.status(201).json({
+        message: "user created",
+        data: {}
+    });
 }
 
 // READ
 function list(req, res) {
-  res.status(200).json({
-    message: 'Users list retrieved successfully',
-    data: [],
-  });
+    res.json({
+        message: "users list",
+        data: []
+    });
 }
 
 function find(req, res) {
-  const { id } = req.params;
-  res.status(200).json({
-    message: `User ${id} retrieved successfully`,
-    data: {},
-  });
+    res.json({
+        message: "user by id",
+        data: {}
+    });
 }
 
 // UPDATE
 function update(req, res) {
-  const { id } = req.params;
-  res.status(200).json({
-    message: `User ${id} updated successfully`,
-    data: {},
-  });
+    res.json({
+        message: "user updated",
+        data: {}
+    });
 }
 
 // DELETE
 function destroy(req, res) {
-  const { id } = req.params;
-  res.status(200).json({
-    message: `User ${id} deleted successfully`,
-    data: {},
-  });
+    res.json({
+        message: "user deleted",
+        data: {}
+    });
 }
 
 module.exports = { create, list, find, update, destroy };
