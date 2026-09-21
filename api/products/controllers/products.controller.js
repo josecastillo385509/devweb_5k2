@@ -1,45 +1,40 @@
-// Controlador de products (respuestas mock: aún sin base de datos)
-
 // CREATE
 function create(req, res) {
-  res.status(201).json({
-    message: 'Product created successfully',
-    data: {},
-  });
+    res.status(201).json({
+        message: "product created",
+        data: {}
+    });
 }
 
 // READ
 function list(req, res) {
-  res.status(200).json({
-    message: 'Products list retrieved successfully',
-    data: [],
-  });
+    res.json({
+        message: "products list",
+        data: []
+    });
 }
 
 function find(req, res) {
-  const { id } = req.params;
-  res.status(200).json({
-    message: `Product ${id} retrieved successfully`,
-    data: {},
-  });
+    res.json({
+        message: "product by id",
+        data: {}
+    });
 }
 
 // UPDATE
 function update(req, res) {
-  const { id } = req.params;
-  res.status(200).json({
-    message: `Product ${id} updated successfully`,
-    data: {},
-  });
+    res.json({
+        message: "product updated",
+        data: {}
+    });
 }
 
 // DELETE
 function destroy(req, res) {
-  const { id } = req.params;
-  res.status(200).json({
-    message: `Product ${id} deleted successfully`,
-    data: {},
-  });
+    res.json({
+        message: "product deleted",
+        data: {}
+    });
 }
 
 module.exports = { create, list, find, update, destroy };

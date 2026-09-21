@@ -1,45 +1,40 @@
-// Controlador de permissions (respuestas mock: aún sin base de datos)
-
 // CREATE
 function create(req, res) {
-  res.status(201).json({
-    message: 'Permission created successfully',
-    data: {},
-  });
+    res.status(201).json({
+        message: "permission created",
+        data: {}
+    });
 }
 
 // READ
 function list(req, res) {
-  res.status(200).json({
-    message: 'Permissions list retrieved successfully',
-    data: [],
-  });
+    res.json({
+        message: "permissions list",
+        data: []
+    });
 }
 
 function find(req, res) {
-  const { id } = req.params;
-  res.status(200).json({
-    message: `Permission ${id} retrieved successfully`,
-    data: {},
-  });
+    res.json({
+        message: "permission by id",
+        data: {}
+    });
 }
 
 // UPDATE
 function update(req, res) {
-  const { id } = req.params;
-  res.status(200).json({
-    message: `Permission ${id} updated successfully`,
-    data: {},
-  });
+    res.json({
+        message: "permission updated",
+        data: {}
+    });
 }
 
 // DELETE
 function destroy(req, res) {
-  const { id } = req.params;
-  res.status(200).json({
-    message: `Permission ${id} deleted successfully`,
-    data: {},
-  });
+    res.json({
+        message: "permission deleted",
+        data: {}
+    });
 }
 
 module.exports = { create, list, find, update, destroy };
