@@ -1,13 +1,13 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+const createError = require('http-errors');
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
 
-var indexRouter = require('./routes/index');
-var apiRouter = require('./api');
+const indexRouter = require('./routes/index');
+const apiRouter = require('./routes');
 
-var app = express();
+const app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -37,10 +37,10 @@ app.use(function(req, res, next) {
 
 // error handler
 app.use(function(err, req, res, next) {
-  var status = err.status || 500;
+  const status = err.status || 500;
 
   if (/^\/api(\/|$)/.test(req.path)) {
-    var message = err.type === 'entity.parse.failed'
+    const message = err.type === 'entity.parse.failed'
       ? 'Invalid JSON body'
       : (status < 500 ? err.message : 'Internal server error');
     return res.status(status).json({ message: message, data: {} });

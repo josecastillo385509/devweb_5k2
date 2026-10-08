@@ -1,25 +1,25 @@
 const express = require('express');
-const { validateNumericId } = require('../../middlewares/validate-id');
-const controller = require('../controllers/orders.controller');
+const { validateNumericId } = require('../api/validate-id');
+const controller = require('../controllers/customers');
 
 const router = express.Router();
 
 // Valida el parámetro :id antes de llegar al controlador
 router.param('id', validateNumericId);
 
-/* POST orders - crear */
+/* POST customers - crear */
 router.post('/', controller.create);
 
-/* GET orders - listar */
+/* GET customers - listar */
 router.get('/', controller.list);
 
-/* GET orders/:id - obtener uno */
+/* GET customers/:id - obtener uno */
 router.get('/:id', controller.find);
 
-/* PUT orders/:id - actualizar */
+/* PUT customers/:id - actualizar */
 router.put('/:id', controller.update);
 
-/* DELETE orders/:id - eliminar */
+/* DELETE customers/:id - eliminar */
 router.delete('/:id', controller.destroy);
 
 module.exports = router;

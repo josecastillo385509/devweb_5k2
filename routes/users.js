@@ -1,5 +1,5 @@
 const express = require('express');
-const controller = require('../controllers/permissions.controller');
+const controller = require('../controllers/users');
 
 const router = express.Router();
 

@@ -5,7 +5,7 @@ module.exports = [
   { ignores: ['node_modules/', 'coverage/', 'public/'] },
   js.configs.recommended,
   {
-    files: ['**/*.js'],
+    files: ['**/*.js', 'bin/www'],
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: 'commonjs',
