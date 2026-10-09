@@ -1,22 +1,24 @@
-// Controlador de orders (respuestas mock: aún sin base de datos)
+const { Order } = require('../models/documents');
 
 // CREATE
-function create(req, res) {
+async function create(req, res) {
+  const order = await Order.create(req.body);
   res.status(201).json({
     message: 'Order created successfully',
-    data: {},
+    data: order,
   });
 }
 
 // READ
-function list(req, res) {
+async function list(req, res) {
+  const orders = await Order.find().populate('customerId');
   res.status(200).json({
     message: 'Orders list retrieved successfully',
-    data: [],
+    data: orders,
   });
 }
 
-function find(req, res) {
+async function find(req, res) {
   const { id } = req.params;
   res.status(200).json({
     message: `Order ${id} retrieved successfully`,
@@ -25,7 +27,7 @@ function find(req, res) {
 }
 
 // UPDATE
-function update(req, res) {
+async function update(req, res) {
   const { id } = req.params;
   res.status(200).json({
     message: `Order ${id} updated successfully`,
@@ -34,7 +36,7 @@ function update(req, res) {
 }
 
 // DELETE
-function destroy(req, res) {
+async function destroy(req, res) {
   const { id } = req.params;
   res.status(200).json({
     message: `Order ${id} deleted successfully`,
