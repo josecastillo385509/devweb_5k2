@@ -1,0 +1,23 @@
+const { DataTypes } = require('sequelize');
+const sequelize = require('../../config/sequelize');
+
+const User = sequelize.define('User', {
+    first_name: { type: DataTypes.STRING(100), allowNull:false },
+    last_name:  { type: DataTypes.STRING(100), allowNull:false },
+    email:      { type: DataTypes.STRING(150), allowNull:false, unique:true },
+    active:     { type: DataTypes.BOOLEAN, defaultValue: true },
+    password_hash:   { type: DataTypes.STRING(100), allowNull:false },
+    salt_key:    { type: DataTypes.STRING(100), allowNull:false }
+},{
+    tableName: 'users',
+    timestamps: true // -> created_at y updated_at
+});
+
+User.prototype.toJSON = function() {
+    const values = { ...this.get()}; // this.get() => [1,2,3] => 1, 2, 3
+    delete values.password_hash;
+    delete values.salt_key;
+    return values;1
+};
+
+module.exports = User;

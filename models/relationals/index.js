@@ -1,5 +1,5 @@
 const sequelize = require('../../config/sequelize');
-const User = require('./Users');
+const User = require('./User');
 const Role = require('./Role');
 const Permission = require('./Permission');
 

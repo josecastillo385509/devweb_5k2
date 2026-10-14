@@ -1,11 +1,20 @@
 const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
+const fs = require('fs');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 
 const indexRouter = require('./routes/index');
-const apiRouter = require('./routes');
+const usersRouter = require('./routes/users');
+const rolesRouter = require('./routes/roles');
+const permissionsRouter = require('./routes/permissions');
+const productsRouter = require('./routes/products');
+const variantsRouter = require('./routes/variants');
+const inventoryRouter = require('./routes/inventory');
+const customersRouter = require('./routes/customers');
+const ordersRouter = require('./routes/orders');
+const authRouter = require('./routes/auth'); 
 
 const app = express();
 
@@ -14,6 +23,10 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
 // logging de solicitudes HTTP
+const logDir = path.join(__dirname, 'logs');
+fs.mkdirSync(logDir, {recurseive: true});
+const accessLogStream = fs.createWriteStream(path.join(logDir, 'access.log'), {flags: 'a'});
+
 app.use(logger('dev', { skip: function() { return process.env.NODE_ENV === 'test'; } }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -21,38 +34,24 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
-app.use('/api', apiRouter);
-
-app.use('/api', function(req, res) {
-  res.status(404).json({
-    message: 'Route not found: ' + req.method + ' ' + req.originalUrl,
-    data: {}
-  });
-});
+app.use('/auth', authRouter);
+app.use('/api/users', usersRouter);
+app.use('/api/roles', rolesRouter);
+app.use('/api/permissions', permissionsRouter);
+app.use('/api/products', productsRouter);
+app.use('/api/variants', variantsRouter);
+app.use('/api/inventory', inventoryRouter);
+app.use('/api/customers', customersRouter);
+app.use('/api/orders', ordersRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
 });
 
-// error handler
-app.use(function(err, req, res, next) {
-  const status = err.status || 500;
-
-  if (/^\/api(\/|$)/.test(req.path)) {
-    const message = err.type === 'entity.parse.failed'
-      ? 'Invalid JSON body'
-      : (status < 500 ? err.message : 'Internal server error');
-    return res.status(status).json({ message: message, data: {} });
-  }
-
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  // render the error page
-  res.status(status);
-  res.render('error');
+app.use(function(err, req, res, _next) {
+  res.status(err.status || 500);
+  res.json({ message: err.message });
 });
 
 module.exports = app;
