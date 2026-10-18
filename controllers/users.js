@@ -1,4 +1,5 @@
 const User = require('../models/relationals/User');
+const Role = require('../models/relationals/Role');
 const { hashPassword } = require('../utils/password');
 
 // CREATE
@@ -25,7 +26,7 @@ async function create(req, res) {
 
 // READ
 async function list(req, res) {
-    const users = await User.findAll({ attributes['first_name', 'last_name', 'email'], include:{ model: Role, as: 'role'} });
+    const users = await User.findAll({ attributes: ['first_name', 'last_name', 'email'], include:{ model: Role, as: 'role'} });
     res.json({
         message: "users list",
         data: users
@@ -34,7 +35,7 @@ async function list(req, res) {
 
 async function find(req, res) {
     const id = req.params.id;
-    const user = await User.findByPk(id, { attributes['first_name', 'last_name', 'email'], include: {model: Role, as: 'role'} });
+    const user = await User.findByPk(id, { attributes: ['first_name', 'last_name', 'email'], include: {model: Role, as: 'role'} });
     res.json({
         message: "get user by id",
         data: user
