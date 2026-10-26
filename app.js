@@ -5,6 +5,8 @@ const path = require('path');
 const fs = require('fs');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
+const { expressjwt } = require('express-jwt');
+const i18n = require('./config/i18n');
 
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
@@ -33,6 +35,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(i18n.init);
 
 app.use('/', indexRouter);
 app.use('/api/auth', authRouter);
