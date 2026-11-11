@@ -29,7 +29,7 @@ async function find(req, res) {
 // UPDATE
 async function update(req, res) {
   const customer = await Customer.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true  });
-  if(!customer) res.status(404).json({message: 'Customer not found'});
+  if(!customer) return res.status(404).json({message: 'Customer not found'});
   res.status(200).json({
     message: 'Customer updated successfully',
     data: customer
@@ -39,7 +39,7 @@ async function update(req, res) {
 // DELETE
 async function destroy(req, res) {
   const customer = await Customer.findByIdAndDelete(req.params.id);
-  if(!customer) res.status(404).json({message: 'Customer not found'});
+  if(!customer) return res.status(404).json({message: 'Customer not found'});
   res.status(200).json({
     message: 'Customer deleted successfully',
     data: { id: customer._id }

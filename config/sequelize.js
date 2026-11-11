@@ -26,6 +26,8 @@ const sequelize = new Sequelize(
     }
 );
 
-console.log("app conectada a " + mysqlConfig.database)
+if (process.env.NODE_ENV !== 'test') {
+    console.log("app conectada a " + mysqlConfig.database);
+}
 
 module.exports = sequelize;

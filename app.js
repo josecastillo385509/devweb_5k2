@@ -5,7 +5,6 @@ const path = require('path');
 const fs = require('fs');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
-const { expressjwt } = require('express-jwt');
 const i18n = require('./config/i18n');
 
 const indexRouter = require('./routes/index');
@@ -30,6 +29,7 @@ const logDir = path.join(__dirname, 'logs');
 fs.mkdirSync(logDir, {recursive: true});
 const accessLogStream = fs.createWriteStream(path.join(logDir, 'access.log'), {flags: 'a'});
 
+app.use(logger('combined', { stream: accessLogStream, skip: function() { return process.env.NODE_ENV === 'test'; } }));
 app.use(logger('dev', { skip: function() { return process.env.NODE_ENV === 'test'; } }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

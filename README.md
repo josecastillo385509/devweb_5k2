@@ -22,22 +22,33 @@ npm run dev
 ```
 ## Pruebas
 
-El proyecto cuenta con pruebas para comprobar el funcionamiento de la aplicación, las cuales el funcionamiento de:
--->Código HTTP esperado
--->Estructura básica de la respuesta
--->Funcionamiento de parámetros de ruta
--->Manejo de recursos inexistentes
--->Comportamiento ante solicitudes incorrectas
+El proyecto cuenta con una suite completa de pruebas automatizadas con **Jest** y **Supertest** para verificar el correcto funcionamiento de los endpoints de la API y utilidades del sistema:
+- Código HTTP esperado (200, 201, 400, 401, 404).
+- Estructura básica y contenido de las respuestas JSON.
+- Validación de parámetros de ruta y tipos de identificadores.
+- Manejo de recursos y rutas inexistentes.
+- Manejo de solicitudes incorrectas (JSON malformado, falta de credenciales o campos obligatorios).
+- Flujo de autenticación con JWT (login, generación de token, protección de rutas y consulta de perfil en `/api/auth/me`).
+- Criptografía de contraseñas (hash y verificación con bcrypt).
 
-Estas pruebas se pueden comprobar al ejecutar el siguiente comando:
+Para ejecutar todas las pruebas:
 ```bash
 npm test
+```
+
+Para ejecutar las pruebas con reporte de cobertura de código:
+```bash
+npm run test:coverage
 ```
 
 ## Tecnologías utilizadas
 
 - [JavaScript/Node.js]
 - [Express.js]
+- [Jest]
+- [Supertest]
+- [Sequelize / MySQL]
+- [Mongoose / MongoDB]
 - [NPM]
 - [Git]
 - [VSCode]
@@ -81,12 +92,17 @@ devweb_5k2/
 |  |-- [index.js]
 |-- [test]
 |  |-- [helpers]
+|  |-- [mocks]
+|  |-- [app.test.js]
+|  |-- [auth.test.js]
 |  |-- [customers.test.js]
 |  |-- [inventory.test.js]
 |  |-- [orders.test.js]
+|  |-- [password.test.js]
 |  |-- [permissions.test.js]
 |  |-- [products.test.js]
 |  |-- [roles.test.js]
+|  |-- [setup.js]
 |  |-- [users.test.js]
 |  |-- [variants.test.js]
 |-- [views]

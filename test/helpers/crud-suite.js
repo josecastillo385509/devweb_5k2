@@ -2,7 +2,7 @@ const request = require('supertest');
 const app = require('../../app');
 
 /**
- * Batería de pruebas CRUD para un recurso con respuestas mock.
+ * Batería de pruebas CRUD para un recurso.
  * @param {string} resource  nombre del recurso (p. ej. 'users')
  */
 function describeCrud(resource) {
@@ -25,9 +25,19 @@ function describeCrud(resource) {
       expect(res.body).toHaveProperty('data');
     });
 
-    //CREATE
+    // CREATE
     test('POST / responde 201 con { message, data }', async () => {
-      const res = await request(app).post(base).send({ example: 'value' });
+      const payload = {
+        example: 'value',
+        name: 'Test',
+        lastName: 'User',
+        email: 'test@example.com',
+        password: 'Password123!',
+        key: 'test_key',
+        description: 'Test description',
+        userID: 1,
+      };
+      const res = await request(app).post(base).send(payload);
       expect(res.status).toBe(201);
       expect(typeof res.body.message).toBe('string');
       expect(res.body).toHaveProperty('data');

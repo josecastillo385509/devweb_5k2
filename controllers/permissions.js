@@ -33,7 +33,7 @@ async function find(req, res, next) {
 async function update(req, res, next) {
     const id = req.params.id;
     const permission = await Permission.findByPk(id);
-    if(!permission) res.status(404).json({ message: "permission not found" });
+    if(!permission) return res.status(404).json({ message: "permission not found" });
     const key = req.body.key;
     const description = req.body.description;
     let changes = {};
@@ -50,7 +50,7 @@ async function update(req, res, next) {
 async function destroy(req, res, next) {
     const id = req.params.id;
     const permission = await Permission.findByPk(id);
-    if(!permission) res.status(404).json({ message: "permission not found "});
+    if(!permission) return res.status(404).json({ message: "permission not found "});
     await permission.destroy();
     res.json({
         message: "permission deleted",

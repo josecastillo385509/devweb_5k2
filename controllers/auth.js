@@ -25,10 +25,10 @@ async function login(req, res, next) {
         }
 
         const user = await User.findOne({ where: { email } });
-        if(!user || !user.active) return res.status(401).json({ message: req.__('auth.InvalidCredentials' )});
+        if(!user || !user.active) return res.status(401).json({ message: req.__('auth.invalidCredentials') });
 
         const valid = await verifyPassword(password, user.password_hash);
-        if(!valid) return res.status(401).json({ message: req.__('auth.InvalidCredentials' )});
+        if(!valid) return res.status(401).json({ message: req.__('auth.invalidCredentials') });
 
         res.json({
             message: "Login successful",
