@@ -1,6 +1,6 @@
 const { Sequelize } = require('sequelize');
 
-// Conexión a MySQL.
+// Conexión a MySQL / PostgreSQL.
 // Todos los valores se pueden sobreescribir con variables de entorno (.env o docker compose);
 // los valores por defecto corresponden a la configuración local original del proyecto.
 // DB_DIALECT=sqlite solo se usa en las pruebas automatizadas (base en memoria).
@@ -23,6 +23,12 @@ if (dialect === 'sqlite') {
     options.host = process.env.DB_HOST || 'localhost';
     // port: El puerto en el que atiende nuestro servidor de base de datos
     options.port = Number(process.env.DB_PORT) || 3306;
+
+    if (dialect === 'postgres') {
+        options.dialectOptions = {
+            ssl: { require: true, rejectUnauthorized: false }
+        };
+    }
 }
 
 const sequelize = new Sequelize(
