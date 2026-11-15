@@ -41,6 +41,9 @@ npm test
 - [NPM]
 - [Git]
 - [VSCode]
+- [PostgreSQL]
+- [MongoDB_Atlas]
+- [Render]
 
 ## Estructura general del proyecto
 
@@ -433,3 +436,34 @@ No requieren Docker, MySQL ni MongoDB: usan SQLite en memoria con la misma matri
 | `test/rbac/access-control.test.js` | Carga de permisos desde la BD y middleware `authorize` |
 | `test/rbac/no-hardcoded-roles.test.js` | Verificación estática: sin comparaciones por nombre de rol, sin autorización en controllers, todas las rutas protegidas |
 | `test/*.test.js` | CRUD de cada recurso como `admin` (y 401 sin token) |
+
+## Despliegue en la nube (Producción)
+
+La API se encuentra desplegada y conectada a bases de datos en la nube para poder probarse en línea sin necesidad de levantar el entorno local.
+
+* **URL de la API en producción:** `https://stride-co-api-r0dw.onrender.com`
+
+### Cómo se realizó la conexión y el despliegue
+
+1. **Base de datos relacional (PostgreSQL en Render):**
+   * Se creó una instancia de PostgreSQL en Render para almacenar usuarios, roles y permisos.
+   * Se instaló el paquete `pg` y `pg-hstore` en el proyecto y se habilitó la conexión segura (`SSL`) en `config/sequelize.js` mediante la variable `DB_SSL=true`.
+2. **Base de datos documental (MongoDB Atlas):**
+   * Se creó un clúster gratuito (`ClusterStride`) en MongoDB Atlas para guardar productos, inventario, clientes y órdenes.
+   * Se creó un usuario de base de datos, se habilitó el acceso desde cualquier IP (`0.0.0.0/0`) para que Render pudiera conectarse y se obtuvo la cadena de conexión (`MONGO_URI`).
+3. **Servidor Web (Render):**
+   * Se vinculó el repositorio de GitHub (`devweb_5k2`, rama `main`) a un servicio tipo *Web Service* en Render usando el `Dockerfile` del proyecto.
+   * Se cargaron todas las credenciales y llaves secretas en la sección **Environment** de Render (`DB_DIALECT=postgres`, `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_SSL=true`, `MONGO_URI` y `JWT_SECRET`).
+   * Con esto, cada vez que se sube un cambio a la rama `main`, Render actualiza y arranca la aplicación automáticamente.
+
+### Cómo arrancar la aplicación
+
+#### En producción (en línea)
+No requiere instalación. Solo realiza las peticiones HTTP (desde Postman, Thunder Client o el frontend) apuntando a `https://stride-co-api-r0dw.onrender.com` (por ejemplo, `POST https://stride-co-api-r0dw.onrender.com/api/auth/login`).
+
+#### En local (en tu computadora)
+1. Clona el repositorio e instala las dependencias:
+   ```bash
+   git clone [https://github.com/josecastillo385509/devweb_5k2.git](https://github.com/josecastillo385509/devweb_5k2.git)
+   cd devweb_5k2
+   npm install
