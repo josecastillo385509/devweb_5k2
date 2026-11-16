@@ -1,5 +1,6 @@
 // Utilidades de pruebas: base de datos SQLite con la MISMA matriz RBAC que carga `npm run seed`,
 // usuarios de demostración y tokens JWT reales (firmados igual que controllers/auth.js).
+const config = require('config');
 const jwt = require('jsonwebtoken');
 const { sequelize, User, Role, Permission } = require('../../models/relationals');
 const { seedRbac, seedDemoUsers } = require('../../db/seeds/rbac');
@@ -22,11 +23,11 @@ async function resetDatabase() {
 }
 
 function tokenFor(user) {
-  return jwt.sign({ sub: String(user.id) }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRES_IN,
-    issuer: process.env.JWT_ISSUER,
-    audience: process.env.JWT_AUDIENCE,
-    algorithm: 'HS256',
+  return jwt.sign({ sub: String(user.id) }, config.get('jwt.secret'), {
+    expiresIn: config.get('jwt.expiresIn'),
+    issuer: config.get('jwt.issuer'),
+    audience: config.get('jwt.audience'),
+    algorithm: config.get('jwt.algorithm'),
   });
 }
 

@@ -3,9 +3,9 @@
 //
 // 1. Crea las tablas si no existen (igual que bin/www).
 // 2. Carga roles, permisos y la matriz (role_permissions) en MySQL.
-// 3. Crea usuarios de demostración (SEED_DEMO_USERS=false para omitirlos).
-// 4. Crea clientes y órdenes de demostración en MongoDB (SEED_MONGO=false para omitirlos).
-require('dotenv').config({ quiet: true });
+// 3. Crea usuarios de demostración (seed.demoUsers=false para omitirlos).
+// 4. Crea clientes y órdenes de demostración en MongoDB (seed.mongo=false para omitirlos).
+const config = require('config');
 const mongoose = require('mongoose');
 const connectMongo = require('../config/mongoose');
 const { seedRbac, seedDemoUsers, sequelize } = require('../db/seeds/rbac');
@@ -35,12 +35,12 @@ async function main() {
   console.log(`RBAC: ${Object.keys(rolePermissions).length} roles, ${permissions.length} permisos`);
   for (const [role, keys] of Object.entries(rolePermissions)) console.log(`  ${role}: ${keys.length} permisos`);
 
-  if (process.env.SEED_DEMO_USERS !== 'false') {
-    const password = process.env.SEED_PASSWORD || 'Passw0rd!';
+  if (config.get('seed.demoUsers') !== false) {
+    const password = config.has('seed.password') ? config.get('seed.password') : 'Passw0rd!';
     const users = await seedDemoUsers(password);
-    console.log(`Usuarios de demostración listos (contraseña: ${password === 'Passw0rd!' ? 'Passw0rd!' : 'SEED_PASSWORD'})`);
+    console.log(`Usuarios de demostración listos (contraseña: ${password === 'Passw0rd!' ? 'Passw0rd!' : 'seed.password'})`);
 
-    if (process.env.SEED_MONGO !== 'false') {
+    if (config.get('seed.mongo') !== false) {
       await seedMongoDemo(users);
       console.log('Clientes y órdenes de demostración listos en MongoDB');
     }

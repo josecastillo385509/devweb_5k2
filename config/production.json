@@ -1,0 +1,12 @@
+{
+  "database": {
+    "sql": {
+      "dialect": "postgres",
+      "port": 5432,
+      "ssl": {
+        "require": true,
+        "rejectUnauthorized": false
+      }
+    }
+  }
+}

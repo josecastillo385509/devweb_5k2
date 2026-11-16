@@ -1,0 +1,20 @@
+{
+  "jwt": {
+    "secret": "REEMPLAZAR_CON_SECRETO_REAL_MINIMO_32_CARACTERES"
+  },
+  "database": {
+    "sql": {
+      "user": "root",
+      "password": "REEMPLAZAR_CON_PASSWORD_DE_BD",
+      "name": "stride-co",
+      "host": "localhost",
+      "port": 3306
+    },
+    "mongo": {
+      "uri": "mongodb://localhost:27017/stride_co"
+    }
+  },
+  "seed": {
+    "password": "Passw0rd!"
+  }
+}
