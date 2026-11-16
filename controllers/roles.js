@@ -2,7 +2,7 @@ const Role = require('../models/relationals/Role');
 const Permission = require('../models/relationals/Permission');
 
 // CREATE
-async function create(req, res) {
+async function create(req, res, next) {
     try {
         const role = await Role.create(req.body);
         if(req.body.permissionIds) role.setPermissions(req.body.permissionIds);
@@ -25,7 +25,7 @@ async function list(req, res) {
 }
 
 async function find(req, res) {
-    const role = await Role.findByPk(req.params.id, { include: { model: Permission, as: 'permissions '}});
+    const role = await Role.findByPk(req.params.id, { include: { model: Permission, as: 'permissions'}});
     res.json({
         message: "role by id",
         data: role
@@ -33,7 +33,7 @@ async function find(req, res) {
 }
 
 // UPDATE
-async function update(req, res) {
+async function update(req, res, next) {
     try {
         const role = await Role.findByPk(req.params.id);
         if(req.body.permissionIds) role.setPermissions(req.body.permissionIds);
@@ -57,7 +57,7 @@ async function update(req, res) {
 async function destroy(req, res) {
     const id = req.params.id;
     const role = await Role.findByPk(id);
-    if(!role) res.status(404).json({
+    if(!role) return res.status(404).json({
         message: "role not found"
     });
     await role.destroy();

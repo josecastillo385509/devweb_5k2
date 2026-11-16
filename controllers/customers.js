@@ -26,10 +26,19 @@ async function find(req, res) {
   });
 }
 
+// Clientes del usuario autenticado (Customer.userID === req.user.id)
+async function mine(req, res) {
+  const customers = await Customer.find({ userID: req.user.id });
+  res.status(200).json({
+    message: 'Own customers list retrieved successfully',
+    data: customers
+  });
+}
+
 // UPDATE
 async function update(req, res) {
   const customer = await Customer.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true  });
-  if(!customer) res.status(404).json({message: 'Customer not found'});
+  if(!customer) return res.status(404).json({message: 'Customer not found'});
   res.status(200).json({
     message: 'Customer updated successfully',
     data: customer
@@ -39,11 +48,11 @@ async function update(req, res) {
 // DELETE
 async function destroy(req, res) {
   const customer = await Customer.findByIdAndDelete(req.params.id);
-  if(!customer) res.status(404).json({message: 'Customer not found'});
+  if(!customer) return res.status(404).json({message: 'Customer not found'});
   res.status(200).json({
     message: 'Customer deleted successfully',
     data: { id: customer._id }
   });
 }
 
-module.exports = { create, list, find, update, destroy };
+module.exports = { create, list, mine, find, update, destroy };

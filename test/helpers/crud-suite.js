@@ -1,17 +1,42 @@
 const request = require('supertest');
 const app = require('../../app');
+const { resetDatabase, bearer } = require('./rbac-db');
 
 /**
- * Batería de pruebas CRUD para un recurso con respuestas mock.
+ * Batería de pruebas CRUD de un recurso, ejecutada como ADMIN (todos los endpoints están
+ * protegidos con authenticate + authorize; la matriz por rol se prueba en test/rbac/).
+ *
  * @param {string} resource  nombre del recurso (p. ej. 'users')
+ * @param {object} [options]
+ * @param {(users) => Promise<string>} [options.seed]  crea un registro existente y devuelve su id
+ *                                      (por defecto el recurso es mock y se usa el id '5')
+ * @param {object|((users) => object)} [options.createBody]  body válido para el POST
  */
-function describeCrud(resource) {
+function describeCrud(resource, options = {}) {
   const base = `/api/${resource}`;
+  let auth;
+  let id = '5';
+  let createBody = { example: 'value' };
 
   describe(`API ${base}`, () => {
+    beforeAll(async () => {
+      const users = await resetDatabase();
+      auth = bearer(users.admin);
+      if (options.seed) id = await options.seed(users);
+      if (options.createBody) {
+        createBody = typeof options.createBody === 'function' ? options.createBody(users) : options.createBody;
+      }
+    });
+
+    // AUTENTICACIÓN
+    test('sin token responde 401', async () => {
+      const res = await request(app).get(base);
+      expect(res.status).toBe(401);
+    });
+
     // READ
     test('GET / responde 200 con { message, data }', async () => {
-      const res = await request(app).get(base);
+      const res = await request(app).get(base).set(auth);
       expect(res.status).toBe(200);
       expect(res.headers['content-type']).toMatch(/json/);
       expect(typeof res.body.message).toBe('string');
@@ -19,7 +44,7 @@ function describeCrud(resource) {
     });
 
     test('GET /:id responde 200 con { message, data }', async () => {
-      const res = await request(app).get(`${base}/5`);
+      const res = await request(app).get(`${base}/${id}`).set(auth);
       expect(res.status).toBe(200);
       expect(typeof res.body.message).toBe('string');
       expect(res.body).toHaveProperty('data');
@@ -27,7 +52,7 @@ function describeCrud(resource) {
 
     //CREATE
     test('POST / responde 201 con { message, data }', async () => {
-      const res = await request(app).post(base).send({ example: 'value' });
+      const res = await request(app).post(base).set(auth).send(createBody);
       expect(res.status).toBe(201);
       expect(typeof res.body.message).toBe('string');
       expect(res.body).toHaveProperty('data');
@@ -36,6 +61,7 @@ function describeCrud(resource) {
     test('POST / con JSON mal formado responde 400', async () => {
       const res = await request(app)
         .post(base)
+        .set(auth)
         .set('Content-Type', 'application/json')
         .send('{"broken":');
       expect(res.status).toBe(400);
@@ -45,7 +71,7 @@ function describeCrud(resource) {
 
     // UPDATE
     test('PUT /:id responde 200 con { message, data }', async () => {
-      const res = await request(app).put(`${base}/5`).send({ example: 'value' });
+      const res = await request(app).put(`${base}/${id}`).set(auth).send({ example: 'value' });
       expect(res.status).toBe(200);
       expect(typeof res.body.message).toBe('string');
       expect(res.body).toHaveProperty('data');
@@ -53,7 +79,7 @@ function describeCrud(resource) {
 
     // DELETE
     test('DELETE /:id responde 200 con { message, data }', async () => {
-      const res = await request(app).delete(`${base}/5`);
+      const res = await request(app).delete(`${base}/${id}`).set(auth);
       expect(res.status).toBe(200);
       expect(typeof res.body.message).toBe('string');
       expect(res.body).toHaveProperty('data');
@@ -61,14 +87,14 @@ function describeCrud(resource) {
 
     // Rutas / métodos inexistentes
     test('una subruta desconocida responde 404 en JSON', async () => {
-      const res = await request(app).get(`${base}/5/nada`);
+      const res = await request(app).get(`${base}/${id}/nada`).set(auth);
       expect(res.status).toBe(404);
       expect(res.headers['content-type']).toMatch(/json/);
       expect(res.body).toHaveProperty('message');
     });
 
     test('un método no implementado (PATCH) responde 404 en JSON', async () => {
-      const res = await request(app).patch(`${base}/5`).send({});
+      const res = await request(app).patch(`${base}/${id}`).set(auth).send({});
       expect(res.status).toBe(404);
       expect(res.body).toHaveProperty('message');
     });
