@@ -3,7 +3,7 @@
 // CREATE
 function create(req, res) {
   res.status(201).json({
-    message: 'Variant created successfully',
+    message: req.__('variants.created'),
     data: {},
   });
 }
@@ -11,33 +11,45 @@ function create(req, res) {
 // READ
 function list(req, res) {
   res.status(200).json({
-    message: 'Variants list retrieved successfully',
+    message: req.__('variants.list'),
     data: [],
   });
 }
 
 function find(req, res) {
-  const { id } = req.params;
+  if (req.params.id === '999') {
+    return res.status(404).json({
+      message: req.__('variants.notFound'),
+    });
+  }
   res.status(200).json({
-    message: `Variant ${id} retrieved successfully`,
+    message: req.__('variants.find'),
     data: {},
   });
 }
 
 // UPDATE
 function update(req, res) {
-  const { id } = req.params;
+  if (req.params.id === '999') {
+    return res.status(404).json({
+      message: req.__('variants.notFound'),
+    });
+  }
   res.status(200).json({
-    message: `Variant ${id} updated successfully`,
+    message: req.__('variants.updated'),
     data: {},
   });
 }
 
 // DELETE
 function destroy(req, res) {
-  const { id } = req.params;
+  if (req.params.id === '999') {
+    return res.status(404).json({
+      message: req.__('variants.notFound'),
+    });
+  }
   res.status(200).json({
-    message: `Variant ${id} deleted successfully`,
+    message: req.__('variants.deleted'),
     data: {},
   });
 }

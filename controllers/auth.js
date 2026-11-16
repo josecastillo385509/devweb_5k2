@@ -2,8 +2,6 @@ const { User } = require('../models/relationals');
 const { verifyPassword } = require('../utils/password');
 const jwt = require('jsonwebtoken');
 
-const INVALID_CREDENTIALS = { message: "Invalid credentials" };
-
 // Firma el JWT con la configuración de .env. El payload solo lleva el id del usuario (sub).
 function signToken(user){
     const jwtOptions = {
@@ -21,17 +19,21 @@ async function login(req, res, next) {
     try {
         const { email, password } = req.body;
         if(typeof email !== 'string' || typeof password !== 'string' || !email || !password) {
-            return res.status(400).json({ message: "email and password are required" });
+            return res.status(400).json({ message: req.__('auth.requiredCredentials') });
         }
 
         const user = await User.findOne({ where: { email } });
-        if(!user || !user.active) return res.status(401).json(INVALID_CREDENTIALS);
+        if(!user || !user.active) {
+            return res.status(401).json({ message: req.__('auth.invalidCredentials') });
+        }
 
         const valid = await verifyPassword(password, user.password_hash);
-        if(!valid) return res.status(401).json(INVALID_CREDENTIALS);
+        if(!valid) {
+            return res.status(401).json({ message: req.__('auth.invalidCredentials') });
+        }
 
         res.json({
-            message: "Login successful",
+            message: req.__('auth.loginSuccess'),
             data: {
                 token: signToken(user),
                 tokenType: "Bearer",

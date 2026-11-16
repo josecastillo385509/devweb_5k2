@@ -4,7 +4,7 @@ const { Customer } = require('../models/documents');
 async function create(req, res) {
   const customer = await Customer.create(req.body);
   res.status(201).json({
-    message: 'Customer created successfully',
+    message: req.__('customers.created'),
     data: customer
   });
 }
@@ -13,15 +13,16 @@ async function create(req, res) {
 async function list(req, res) {
   const customers = await Customer.find();
   res.status(200).json({
-    message: 'Customers list retrieved successfully',
+    message: req.__('customers.list'),
     data: customers
   });
 }
 
 async function find(req, res) {
   const customer = await Customer.findById(req.params.id);
+  if (!customer) return res.status(404).json({ message: req.__('customers.notFound') });
   res.status(200).json({
-    message: 'Customer ${id} retrieved successfully',
+    message: req.__('customers.find'),
     data: customer
   });
 }
@@ -30,17 +31,17 @@ async function find(req, res) {
 async function mine(req, res) {
   const customers = await Customer.find({ userID: req.user.id });
   res.status(200).json({
-    message: 'Own customers list retrieved successfully',
+    message: req.__('customers.mine'),
     data: customers
   });
 }
 
 // UPDATE
 async function update(req, res) {
-  const customer = await Customer.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true  });
-  if(!customer) return res.status(404).json({message: 'Customer not found'});
+  const customer = await Customer.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+  if(!customer) return res.status(404).json({ message: req.__('customers.notFound') });
   res.status(200).json({
-    message: 'Customer updated successfully',
+    message: req.__('customers.updated'),
     data: customer
   });
 }
@@ -48,9 +49,9 @@ async function update(req, res) {
 // DELETE
 async function destroy(req, res) {
   const customer = await Customer.findByIdAndDelete(req.params.id);
-  if(!customer) return res.status(404).json({message: 'Customer not found'});
+  if(!customer) return res.status(404).json({ message: req.__('customers.notFound') });
   res.status(200).json({
-    message: 'Customer deleted successfully',
+    message: req.__('customers.deleted'),
     data: { id: customer._id }
   });
 }

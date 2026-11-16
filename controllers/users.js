@@ -9,7 +9,7 @@ async function create(req, res, next) {
     const email = req.body.email;
     const roleId = req.body.roleId;
     const password = req.body.password;
-    if(!password) return res.status(400).json({ message: 'password is required' });
+    if(!password) return res.status(400).json({ message: req.__('users.passwordRequired') });
     try {
         const passwordData = await hashPassword(password);
         const user = await User.create({
@@ -21,7 +21,7 @@ async function create(req, res, next) {
             salt_key: passwordData.saltKey
         });
         res.status(201).json({
-            message: 'user created',
+            message: req.__('users.created'),
             data: user
         });
     } catch(err) {
@@ -33,7 +33,7 @@ async function create(req, res, next) {
 async function list(req, res) {
     const users = await User.findAll({ attributes: ['first_name', 'last_name', 'email'], include:{ model: Role, as: 'role'} });
     res.json({
-        message: "users list",
+        message: req.__('users.list'),
         data: users
     });
 }
@@ -41,8 +41,9 @@ async function list(req, res) {
 async function find(req, res) {
     const id = req.params.id;
     const user = await User.findByPk(id, { attributes: ['first_name', 'last_name', 'email'], include: {model: Role, as: 'role'} });
+    if (!user) return res.status(404).json({ message: req.__('users.notFound') });
     res.json({
-        message: "get user by id",
+        message: req.__('users.find'),
         data: user
     });
 }
@@ -56,11 +57,11 @@ async function update(req, res, next) {
         const lastName = req.body.lastName;
         const email = req.body.email;
         const password = req.body.password;
-        if(!user) return res.status(404).json({ message: 'User not found'});
+        if(!user) return res.status(404).json({ message: req.__('users.notFound') });
         let changes = {};
-        changes.first_name = name ? name : user.first_name
-        changes.last_name = lastName ? lastName : user.last_name
-        changes.email = email ? email : user.email
+        changes.first_name = name ? name : user.first_name;
+        changes.last_name = lastName ? lastName : user.last_name;
+        changes.email = email ? email : user.email;
 
         // Al cambiar la contraseña se genera un nuevo salt y un nuevo hash (se guardan juntos)
         if(password) {
@@ -72,7 +73,7 @@ async function update(req, res, next) {
         await user.update(changes);
 
         res.json({
-            message: "user updated",
+            message: req.__('users.updated'),
             data: user
         });
     } catch(err) {
@@ -84,10 +85,10 @@ async function update(req, res, next) {
 async function destroy(req, res) {
     const id = req.params.id;
     const user = await User.findByPk(id);
-    if(!user) return res.status(404).json({ message: 'User not found'});
+    if(!user) return res.status(404).json({ message: req.__('users.notFound') });
     await user.destroy();
     res.json({
-        message: "user deleted",
+        message: req.__('users.deleted'),
         data: user
     });
 }

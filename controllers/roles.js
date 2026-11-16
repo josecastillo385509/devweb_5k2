@@ -7,7 +7,7 @@ async function create(req, res, next) {
         const role = await Role.create(req.body);
         if(req.body.permissionIds) role.setPermissions(req.body.permissionIds);
         res.status(201).json({
-            message: "role created",
+            message: req.__('roles.created'),
             data: role
         });
     } catch(err) {
@@ -19,15 +19,16 @@ async function create(req, res, next) {
 async function list(req, res) {
     const roles = await Role.findAll({ include: { model: Permission, as: 'permissions' } });
     res.json({
-        message: "roles list",
+        message: req.__('roles.list'),
         data: roles
     });
 }
 
 async function find(req, res) {
     const role = await Role.findByPk(req.params.id, { include: { model: Permission, as: 'permissions'}});
+    if (!role) return res.status(404).json({ message: req.__('roles.notFound') });
     res.json({
-        message: "role by id",
+        message: req.__('roles.find'),
         data: role
     });
 }
@@ -36,21 +37,18 @@ async function find(req, res) {
 async function update(req, res, next) {
     try {
         const role = await Role.findByPk(req.params.id);
-        if(req.body.permissionIds) role.setPermissions(req.body.permissionIds);
         if(!role) return res.status(404).json({
-            message: "role not found"
+            message: req.__('roles.notFound')
         });
         await role.update(req.body);
         if(req.body.permissionIds) role.setPermissions(req.body.permissionIds);
         res.json({
-            message: "role updated",
+            message: req.__('roles.updated'),
             data: role
         });
     } catch(err) {
         next(err);
     }
-    /*
-    */
 }
 
 // DELETE
@@ -58,11 +56,11 @@ async function destroy(req, res) {
     const id = req.params.id;
     const role = await Role.findByPk(id);
     if(!role) return res.status(404).json({
-        message: "role not found"
+        message: req.__('roles.notFound')
     });
     await role.destroy();
     res.json({
-        message: "role deleted",
+        message: req.__('roles.deleted'),
         data: role
     });
 }

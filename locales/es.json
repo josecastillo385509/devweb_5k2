@@ -1,0 +1,85 @@
+{
+  "products": {
+    "list": "Productos obtenidos",
+    "notFound": "Producto no encontrado",
+    "created": "Producto creado",
+    "find": "Producto obtenido",
+    "updated": "Producto actualizado",
+    "deleted": "Producto eliminado"
+  },
+  "variants": {
+    "list": "Variantes obtenidas",
+    "notFound": "Variante no encontrada",
+    "created": "Variante creada",
+    "find": "Variante obtenida",
+    "updated": "Variante actualizada",
+    "deleted": "Variante eliminada"
+  },
+  "inventory": {
+    "list": "Inventario obtenido",
+    "notFound": "Artículo de inventario no encontrado",
+    "created": "Artículo de inventario creado",
+    "find": "Artículo de inventario obtenido",
+    "updated": "Artículo de inventario actualizado",
+    "deleted": "Artículo de inventario eliminado"
+  },
+  "customers": {
+    "list": "Clientes obtenidos",
+    "notFound": "Cliente no encontrado",
+    "created": "Cliente creado",
+    "find": "Cliente obtenido",
+    "mine": "Clientes propios obtenidos",
+    "updated": "Cliente actualizado",
+    "deleted": "Cliente eliminado"
+  },
+  "orders": {
+    "list": "Órdenes obtenidas",
+    "notFound": "Orden no encontrada",
+    "created": "Orden creada",
+    "find": "Orden obtenida",
+    "mine": "Órdenes propias obtenidas",
+    "updated": "Orden actualizada",
+    "deleted": "Orden eliminada"
+  },
+  "users": {
+    "list": "Usuarios obtenidos",
+    "notFound": "Usuario no encontrado",
+    "created": "Usuario creado",
+    "find": "Usuario obtenido",
+    "updated": "Usuario actualizado",
+    "deleted": "Usuario eliminado",
+    "passwordRequired": "La contraseña es requerida"
+  },
+  "roles": {
+    "list": "Roles obtenidos",
+    "notFound": "Rol no encontrado",
+    "created": "Rol creado",
+    "find": "Rol obtenido",
+    "updated": "Rol actualizado",
+    "deleted": "Rol eliminado"
+  },
+  "permissions": {
+    "list": "Permisos obtenidos",
+    "notFound": "Permiso no encontrado",
+    "created": "Permiso creado",
+    "find": "Permiso obtenido",
+    "updated": "Permiso actualizado",
+    "deleted": "Permiso eliminado"
+  },
+  "auth": {
+    "loginSuccess": "Inicio de sesión exitoso",
+    "invalidCredentials": "Credenciales inválidas",
+    "requiredCredentials": "El correo y la contraseña son requeridos"
+  },
+  "errors": {
+    "unauthorized": "No autorizado",
+    "forbidden": "Prohibido",
+    "notFound": "No encontrado",
+    "internalError": "Error interno del servidor",
+    "invalidId": "Identificador inválido"
+  },
+  "views": {
+    "homeTitle": "Inicio",
+    "welcome": "Bienvenido a %s"
+  }
+}
