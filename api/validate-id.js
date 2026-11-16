@@ -10,7 +10,7 @@ function buildValidator(pattern, expected) {
   return function validateId(req, res, next, id) {
     if (!pattern.test(id)) {
       return res.status(400).json({
-        message: `Invalid id "${id}": expected ${expected}`,
+        message: req.__ ? req.__('errors.invalidId') : `Invalid id "${id}": expected ${expected}`,
         data: {},
       });
     }

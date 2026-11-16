@@ -3,7 +3,7 @@
 // CREATE
 function create(req, res) {
   res.status(201).json({
-    message: 'Inventory item created successfully',
+    message: req.__('inventory.created'),
     data: {},
   });
 }
@@ -11,33 +11,45 @@ function create(req, res) {
 // READ
 function list(req, res) {
   res.status(200).json({
-    message: 'Inventory list retrieved successfully',
+    message: req.__('inventory.list'),
     data: [],
   });
 }
 
 function find(req, res) {
-  const { id } = req.params;
+  if (req.params.id === '999') {
+    return res.status(404).json({
+      message: req.__('inventory.notFound'),
+    });
+  }
   res.status(200).json({
-    message: `Inventory item ${id} retrieved successfully`,
+    message: req.__('inventory.find'),
     data: {},
   });
 }
 
 // UPDATE
 function update(req, res) {
-  const { id } = req.params;
+  if (req.params.id === '999') {
+    return res.status(404).json({
+      message: req.__('inventory.notFound'),
+    });
+  }
   res.status(200).json({
-    message: `Inventory item ${id} updated successfully`,
+    message: req.__('inventory.updated'),
     data: {},
   });
 }
 
 // DELETE
 function destroy(req, res) {
-  const { id } = req.params;
+  if (req.params.id === '999') {
+    return res.status(404).json({
+      message: req.__('inventory.notFound'),
+    });
+  }
   res.status(200).json({
-    message: `Inventory item ${id} deleted successfully`,
+    message: req.__('inventory.deleted'),
     data: {},
   });
 }

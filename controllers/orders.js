@@ -5,7 +5,7 @@ async function create(req, res, next) {
   try {
     const order = await Order.create(req.body);
     res.status(201).json({
-      message: 'Order created successfully',
+      message: req.__('orders.created'),
       data: order,
     });
   } catch (err) {
@@ -18,7 +18,7 @@ async function list(req, res, next) {
   try {
     const orders = await Order.find().populate('customerId');
     res.status(200).json({
-      message: 'Orders list retrieved successfully',
+      message: req.__('orders.list'),
       data: orders,
     });
   } catch (err) {
@@ -32,7 +32,7 @@ async function mine(req, res, next) {
     const customers = await Customer.find({ userID: req.user.id });
     const orders = await Order.find({ customerId: { $in: customers.map((c) => c._id) } }).populate('customerId');
     res.status(200).json({
-      message: 'Own orders list retrieved successfully',
+      message: req.__('orders.mine'),
       data: orders,
     });
   } catch (err) {
@@ -43,9 +43,9 @@ async function mine(req, res, next) {
 async function find(req, res, next) {
   try {
     const order = await Order.findById(req.params.id).populate('customerId');
-    if (!order) return res.status(404).json({ message: 'Order not found' });
+    if (!order) return res.status(404).json({ message: req.__('orders.notFound') });
     res.status(200).json({
-      message: `Order ${req.params.id} retrieved successfully`,
+      message: req.__('orders.find'),
       data: order,
     });
   } catch (err) {
@@ -57,9 +57,9 @@ async function find(req, res, next) {
 async function update(req, res, next) {
   try {
     const order = await Order.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
-    if (!order) return res.status(404).json({ message: 'Order not found' });
+    if (!order) return res.status(404).json({ message: req.__('orders.notFound') });
     res.status(200).json({
-      message: `Order ${req.params.id} updated successfully`,
+      message: req.__('orders.updated'),
       data: order,
     });
   } catch (err) {
@@ -71,9 +71,9 @@ async function update(req, res, next) {
 async function destroy(req, res, next) {
   try {
     const order = await Order.findByIdAndDelete(req.params.id);
-    if (!order) return res.status(404).json({ message: 'Order not found' });
+    if (!order) return res.status(404).json({ message: req.__('orders.notFound') });
     res.status(200).json({
-      message: `Order ${req.params.id} deleted successfully`,
+      message: req.__('orders.deleted'),
       data: { id: order._id },
     });
   } catch (err) {

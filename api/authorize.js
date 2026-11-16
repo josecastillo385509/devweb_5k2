@@ -13,7 +13,9 @@
 // Este middleware NO autentica: debe ir después de `authenticate`. Si no hay req.user responde 401.
 const { can } = require('../rbac/access-control');
 
-const FORBIDDEN = { message: 'Forbidden' };
+function getForbidden(req) {
+  return { message: req.__ ? req.__('errors.forbidden') : 'Forbidden' };
+}
 
 /**
  * @param {string} resource    products, orders, users...
@@ -28,7 +30,7 @@ const FORBIDDEN = { message: 'Forbidden' };
 function authorize(resource, action, possession = 'any', options = {}) {
   return async function authorizeMiddleware(req, res, next) {
     try {
-      if (!req.user) return res.status(401).json({ message: 'Unauthorized' });
+      if (!req.user) return res.status(401).json({ message: req.__ ? req.__('errors.unauthorized') : 'Unauthorized' });
 
       const roleId = req.user.role_id;
 
@@ -39,20 +41,20 @@ function authorize(resource, action, possession = 'any', options = {}) {
       }
 
       // 2) un endpoint 'any' no admite el permiso :own
-      if (possession !== 'own') return res.status(403).json(FORBIDDEN);
+      if (possession !== 'own') return res.status(403).json(getForbidden(req));
 
       // 3) permiso :own -> solo sobre recursos propios
       if (!(await can(roleId, resource, action, 'own'))) {
-        return res.status(403).json(FORBIDDEN);
+        return res.status(403).json(getForbidden(req));
       }
 
       if (typeof options.owner === 'function') {
         const ownerId = await options.owner(req);
         if (ownerId === undefined || ownerId === null) {
-          return res.status(404).json({ message: 'Resource not found' });
+          return res.status(404).json({ message: req.__ ? req.__('errors.notFound') : 'Resource not found' });
         }
         if (String(ownerId) !== String(req.user.id)) {
-          return res.status(403).json(FORBIDDEN);
+          return res.status(403).json(getForbidden(req));
         }
       }
       // sin `owner`: el endpoint ya está acotado al usuario autenticado (p. ej. /orders/mine)
