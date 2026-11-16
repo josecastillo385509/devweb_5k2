@@ -132,3 +132,304 @@ Ejemplo del bender de Authotization: Bearer <token>:
 }
 ```
 El tiempo de expiración configurado es de 15 minutos. Después de que pase este tiempo sin actividad, se cerrará la sesión del usuario, el cual tendrá que iniciar sesión nuevamente si desea seguir utilizando la aplicación.
+
+
+## Control de acceso basado en roles
+
+La API implementa RBAC (autorización) sobre la autenticación JWT ya existente. El flujo completo es:
+
+```text
+User -> Role -> Role_Permission -> Permission -> Librería RBAC (accesscontrol) -> Middleware authorize -> Endpoints protegidos
+```
+
+Request -> `authenticate` (401 si no hay usuario válido) -> `authorize(recurso, acción, alcance)` (403 si no tiene permiso) -> controller.
+
+### Roles utilizados
+
+| Rol (`Role.name`) | Descripción |
+|---|---|
+| `admin` | Administrador: control total del sistema |
+| `sales` | Ventas: atiende clientes, órdenes e inventario |
+| `user` | Usuario: opera únicamente sobre sus propios datos |
+
+### Convención de `Permission.key`
+
+`Permission.key` identifica cada operación autorizable con el formato **`recurso:acción:alcance`**:
+
+```text
+orders:read:own
+  |     |    |
+  |     |    +-- alcance (possession): own | any
+  |     +------- acción: create | read | update | delete
+  +------------- recurso: products, variants, inventory, customers, orders, users, roles, permissions
+```
+
+- `any`: permite operar sobre cualquier recurso del tipo indicado.
+- `own`: permite operar únicamente sobre recursos del propio usuario.
+- En AccessControl el permiso `any` implica `own`, por eso `admin` y `sales` no repiten los permisos `own` que ya cubren con `any`.
+
+### Permisos definidos
+
+Hay 40 permisos (tabla `permissions`), uno por cada combinación usada por la API:
+
+| Recurso | Permisos |
+|---|---|
+| products, variants | `create:any` `read:any` `update:any` `delete:any` |
+| inventory | `create:any` `read:any` `update:any` `delete:any` |
+| customers, orders | `create:any` `create:own` `read:any` `read:own` `update:any` `update:own` `delete:any` |
+| users | `create:any` `read:any` `read:own` `update:any` `update:own` `delete:any` |
+| roles, permissions | `create:any` `read:any` `update:any` `delete:any` |
+
+### Matriz RBAC
+
+✓ = permitido, × = denegado (403). Coincide con los registros de `roles`, `permissions` y `role_permissions` que carga `npm run seed` y con las pruebas automatizadas (`test/rbac/matrix.test.js`).
+
+| Recurso / operación | ADMIN | SALES | USER |
+|---|:-:|:-:|:-:|
+| Products — Read Any | ✓ | ✓ | ✓ |
+| Products — Create / Update / Delete Any | ✓ | × | × |
+| Variants — Read Any | ✓ | ✓ | ✓ |
+| Variants — Create / Update / Delete Any | ✓ | × | × |
+| Inventory — Read Any | ✓ | ✓ | × |
+| Inventory — Update Any | ✓ | ✓ | × |
+| Inventory — Create / Delete Any | ✓ | × | × |
+| Customers — Create Any | ✓ | ✓ | × |
+| Customers — Create Own | ✓ | ✓ | ✓ |
+| Customers — Read Any | ✓ | ✓ | × |
+| Customers — Read Own | ✓ | ✓ | ✓ |
+| Customers — Update Any | ✓ | ✓ | × |
+| Customers — Update Own | ✓ | ✓ | ✓ |
+| Customers — Delete Any | ✓ | × | × |
+| Orders — Create Any | ✓ | ✓ | × |
+| Orders — Create Own | ✓ | ✓ | ✓ |
+| Orders — Read Any | ✓ | ✓ | × |
+| Orders — Read Own | ✓ | ✓ | ✓ |
+| Orders — Update Any | ✓ | ✓ | × |
+| Orders — Update Own | ✓ | ✓ | ✓ |
+| Orders — Delete Any | ✓ | × | × |
+| Users — Create / Read / Update / Delete Any | ✓ | × | × |
+| Users — Read Own / Update Own | ✓ | ✓ | ✓ |
+| Roles — CRUD Any | ✓ | × | × |
+| Permissions — CRUD Any | ✓ | × | × |
+
+### Endpoints protegidos
+
+Todos los endpoints de `/api/*` (excepto `/api/auth/login`, `/api/auth/me` y `/health`) pasan por `authenticate` y `authorize`. El alcance indicado es el que exige cada ruta.
+
+| Endpoint | Permiso requerido | Comprobación de propiedad |
+|---|---|---|
+| `POST/GET/PUT/DELETE /api/products[/:id]` | `products:create/read/update/delete:any` | — |
+| `POST/GET/PUT/DELETE /api/variants[/:id]` | `variants:create/read/update/delete:any` | — |
+| `POST/GET/PUT/DELETE /api/inventory[/:id]` | `inventory:create/read/update/delete:any` | — |
+| `GET /api/orders` | `orders:read:any` | — |
+| `GET /api/orders/mine` | `orders:read:own` | La consulta se limita al usuario autenticado |
+| `GET /api/orders/:id` | `orders:read:own` | La orden debe pertenecer al usuario |
+| `PUT /api/orders/:id` | `orders:update:own` | La orden debe pertenecer al usuario (y no se puede reasignar a un cliente ajeno) |
+| `POST /api/orders` | `orders:create:own` | `customerId` debe ser un cliente del usuario |
+| `DELETE /api/orders/:id` | `orders:delete:any` | — |
+| `GET /api/customers` | `customers:read:any` | — |
+| `GET /api/customers/mine` | `customers:read:own` | La consulta se limita al usuario autenticado |
+| `GET /api/customers/:id` | `customers:read:own` | El cliente debe pertenecer al usuario |
+| `PUT /api/customers/:id` | `customers:update:own` | El cliente debe pertenecer al usuario (no se puede reasignar) |
+| `POST /api/customers` | `customers:create:own` | `userID` debe ser el usuario autenticado |
+| `DELETE /api/customers/:id` | `customers:delete:any` | — |
+| `POST/GET /api/users`, `DELETE /api/users/:id` | `users:create/read/delete:any` | — |
+| `GET/PUT /api/users/:id` | `users:read:own` / `users:update:own` | El `:id` debe ser el del usuario autenticado |
+| `POST/GET/PUT/DELETE /api/roles[/:id]` | `roles:create/read/update/delete:any` | — |
+| `POST/GET/PUT/DELETE /api/permissions[/:id]` | `permissions:create/read/update/delete:any` | — |
+
+### Cómo se obtiene la configuración de permisos desde la base de datos
+
+Los permisos **no** están escritos en el código: la base de datos (`roles` → `role_permissions` → `permissions`) es la única fuente de verdad.
+
+1. `rbac/access-control.js` consulta con un solo `Role.findAll({ include: Permission })` los roles y sus permisos.
+2. Cada `Permission.key` se separa en `resource`, `action` y `possession` (`rbac/parse-permission.js`; las keys que no cumplen la convención se ignoran).
+3. Con ellos se construye el arreglo de *grants* de AccessControl, por ejemplo `{ role: 'user', resource: 'orders', action: 'read:own', attributes: '*' }`.
+4. La configuración se conserva `RBAC_CACHE_TTL_SECONDS` segundos en memoria (10 por defecto; `0` = consultar la BD en cada solicitud). Un cambio en las tablas se refleja en la API sin reiniciarla, como máximo después de ese tiempo.
+5. El middleware `api/authorize.js` toma `req.user.role_id` (que deja `authenticate`), lo traduce al rol y pregunta a AccessControl. No hay validaciones por nombre de rol ni lógica de autorización en los controllers.
+
+```js
+router.delete('/:id', authorize('products', 'delete', 'any'), controller.destroy);
+router.get('/:id', authorize('orders', 'read', 'own', { owner: orderOwner }), controller.find);
+```
+
+### Ejemplo de permiso `any`
+
+`products:delete:any` lo tiene `admin`; `sales` y `user` no.
+
+```text
+DELETE /api/products/7   (token de admin)  -> 200
+DELETE /api/products/7   (token de sales)  -> 403 { "message": "Forbidden" }
+GET    /api/orders       (token de sales, orders:read:any)  -> 200, todas las órdenes
+GET    /api/orders       (token de user, sin orders:read:any) -> 403
+```
+
+### Ejemplo de permiso `own`
+
+`orders:read:own` lo tiene `user`. El middleware (`api/ownership.js`) busca la orden en MongoDB, obtiene su cliente y compara `Customer.userID` con `req.user.id` (el usuario autenticado). Nunca se usa un dato enviado por el cliente para decidir quién es el dueño.
+
+```text
+GET /api/orders/<orden propia>  (token de user)  -> 200
+GET /api/orders/<orden ajena>   (token de user)  -> 403 { "message": "Forbidden" }
+GET /api/orders/<id inexistente> (token de user) -> 404
+```
+
+### Respuestas
+
+| Código | Significado |
+|---|---|
+| `401 Unauthorized` | No hay token válido o el usuario no existe / está inactivo (lo resuelve `authenticate`) |
+| `403 Forbidden` | Usuario autenticado sin el permiso requerido, o recurso `own` de otro usuario (lo resuelve `authorize`) |
+
+### Configurar la matriz con Docker
+
+La matriz vive en las tablas `roles`, `permissions` y `role_permissions` de MySQL. Con Docker se levantan las bases de datos (MySQL y MongoDB), se cargan los registros de la matriz y, opcionalmente, la API.
+
+**Requisitos:** Docker con Compose v2 (`docker compose ...`; con Compose v1 usar `docker-compose ...`). Los puertos 3000, 3306 y 27017 deben estar libres.
+
+**1. Preparar las variables de entorno**
+
+```bash
+cp .env.example .env
+```
+
+Edita `.env` y define `JWT_SECRET` (por ejemplo con `openssl rand -hex 32`). El resto de los valores por defecto sirven tal cual.
+
+**2. Levantar los servicios** (elige una opción)
+
+- **Opción A – todo en Docker (MySQL + MongoDB + API):**
+
+  ```bash
+  docker compose up -d --build
+  docker compose ps          # mysql y mongo deben aparecer como "healthy"
+  ```
+
+  La API crea las tablas al arrancar y queda en http://localhost:3000.
+
+- **Opción B – solo las bases de datos en Docker y la API en tu máquina:**
+
+  ```bash
+  docker compose up -d mysql mongo
+  npm install
+  ```
+
+**3. Cargar la matriz RBAC (seed)**
+
+El seed crea los roles, los 40 permisos, las asignaciones de `role_permissions` y usuarios/clientes/órdenes de demostración. Es idempotente: se puede ejecutar varias veces.
+
+```bash
+# Opción A (dentro de Docker)
+docker compose --profile seed run --rm seed
+
+# Opción B (desde tu máquina; usa DB_HOST=localhost del .env)
+npm run seed
+npm run dev
+```
+
+Resultado esperado:
+
+```text
+RBAC: 3 roles, 40 permisos
+  admin: 32 permisos
+  sales: 12 permisos
+  user: 10 permisos
+```
+
+Usuarios de demostración (contraseña `Passw0rd!`, o el valor de `SEED_PASSWORD`):
+
+| Email | Rol |
+|---|---|
+| `admin@stride.co` | `admin` |
+| `sales@stride.co` | `sales` |
+| `user@stride.co` | `user` |
+| `user2@stride.co` | `user` (segundo usuario, para probar `own`: sus órdenes no pertenecen a `user@stride.co`) |
+
+**4. Verificar la matriz en la base de datos**
+
+```bash
+docker compose exec mysql mysql -uroot -p stride-co
+# (escribe la contraseña de DB_PASSWORD; por defecto abcd1234)
+```
+
+```sql
+-- Permisos de cada rol
+SELECT r.name AS role, p.key AS permission
+FROM roles r
+JOIN role_permissions rp ON rp.role_id = r.id
+JOIN permissions p ON p.id = rp.permission_id
+ORDER BY r.name, p.key;
+
+-- Cantidad de permisos por rol (admin 32, sales 12, user 10)
+SELECT r.name, COUNT(*) AS total
+FROM roles r JOIN role_permissions rp ON rp.role_id = r.id
+GROUP BY r.name;
+```
+
+**5. Modificar la matriz directamente en la base de datos**
+
+Con la sesión de `mysql` abierta (paso 4). Los cambios aplican sin reiniciar la API, en cuanto vence `RBAC_CACHE_TTL_SECONDS` (10 s por defecto; con `0` es inmediato).
+
+```sql
+-- Dar a "sales" el permiso products:delete:any
+INSERT INTO role_permissions (role_id, permission_id)
+SELECT r.id, p.id FROM roles r, permissions p
+WHERE r.name = 'sales' AND p.key = 'products:delete:any';
+
+-- Quitárselo
+DELETE rp FROM role_permissions rp
+JOIN roles r ON r.id = rp.role_id
+JOIN permissions p ON p.id = rp.permission_id
+WHERE r.name = 'sales' AND p.key = 'products:delete:any';
+
+-- Crear un permiso nuevo (formato recurso:acción:alcance) y un rol nuevo
+INSERT INTO permissions (`key`, description) VALUES ('inventory:delete:own', 'Eliminar su propio inventario');
+INSERT INTO roles (name, description, created_at, updated_at) VALUES ('auditor', 'Solo lectura', NOW(), NOW());
+```
+
+También se puede hacer desde la API con un token de `admin` (`/api/roles`, `/api/permissions`).
+
+> `npm run seed` vuelve a dejar los roles `admin`, `sales` y `user` exactamente como los define `db/seeds/rbac-matrix.js`, por lo que **sobrescribe** los cambios manuales sobre esos tres roles. Para que un cambio sea permanente, edita `db/seeds/rbac-matrix.js` y vuelve a ejecutar el seed. Los roles y permisos extra (como `auditor`) no se borran.
+
+**6. Probar la API**
+
+```bash
+# Token de cada rol
+ADMIN=$(curl -s -X POST localhost:3000/api/auth/login -H 'Content-Type: application/json' \
+  -d '{"email":"admin@stride.co","password":"Passw0rd!"}' | sed -E 's/.*"token":"([^"]+)".*/\1/')
+SALES=$(curl -s -X POST localhost:3000/api/auth/login -H 'Content-Type: application/json' \
+  -d '{"email":"sales@stride.co","password":"Passw0rd!"}' | sed -E 's/.*"token":"([^"]+)".*/\1/')
+USER1=$(curl -s -X POST localhost:3000/api/auth/login -H 'Content-Type: application/json' \
+  -d '{"email":"user@stride.co","password":"Passw0rd!"}' | sed -E 's/.*"token":"([^"]+)".*/\1/')
+
+# any: admin puede (200), sales no (403)
+curl -i -X DELETE localhost:3000/api/products/1 -H "Authorization: Bearer $ADMIN"
+curl -i -X DELETE localhost:3000/api/products/1 -H "Authorization: Bearer $SALES"
+
+# own: el usuario ve sus órdenes (200) y recibe 403 con la de otro usuario
+curl -s localhost:3000/api/orders/mine -H "Authorization: Bearer $USER1"     # copia el _id de una orden
+curl -s localhost:3000/api/orders      -H "Authorization: Bearer $ADMIN"     # busca el _id de la orden de user2@stride.co
+curl -i localhost:3000/api/orders/<id-orden-ajena> -H "Authorization: Bearer $USER1"   # 403
+```
+
+**7. Apagar / reiniciar desde cero**
+
+```bash
+docker compose down        # detiene los contenedores (conserva los datos)
+docker compose down -v     # además borra los volúmenes (MySQL y MongoDB vacíos)
+```
+
+### Pruebas del control de acceso
+
+```bash
+npm test
+```
+
+No requieren Docker, MySQL ni MongoDB: usan SQLite en memoria con la misma matriz del seed y un doble en memoria de los modelos de MongoDB.
+
+| Archivo | Qué comprueba |
+|---|---|
+| `test/rbac/scenarios.test.js` | Escenarios mínimos de la tarea: acceso permitido, acceso denegado (403), recurso propio, recurso de otro usuario, permiso `any` no asignado; 401 vs 403; cambios de permisos en la BD |
+| `test/rbac/matrix.test.js` | Matriz completa rol × endpoint contra la API |
+| `test/rbac/access-control.test.js` | Carga de permisos desde la BD y middleware `authorize` |
+| `test/rbac/no-hardcoded-roles.test.js` | Verificación estática: sin comparaciones por nombre de rol, sin autorización en controllers, todas las rutas protegidas |
+| `test/*.test.js` | CRUD de cada recurso como `admin` (y 401 sin token) |
