@@ -1,4 +1,9 @@
 {
+feat/automatized-jest-supertest
+    "auth": {
+        "invalidCredentials": "Invalid Credentials"
+    }
+
   "products": {
     "list": "Products retrieved",
     "notFound": "Product not found",
@@ -82,4 +87,5 @@
     "homeTitle": "Home",
     "welcome": "Welcome to %s"
   }
+main
 }

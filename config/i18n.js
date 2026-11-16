@@ -1,8 +1,23 @@
+feat/automatized-jest-supertest
+
 const config = require('config');
+main
 const path = require('path');
 const i18n = require('i18n');
 
 i18n.configure({
+feat/automatized-jest-supertest
+    locales:['es','en'],
+    //defaultLocale: 'es', // Con que idioma queremos contestar si no viene la cookie
+    directory: path.join(__dirname, '..', 'locales'),
+    queryParameter: 'lang',
+    header: 'accept-language',
+    cookie: 'lang',
+    objectNotation: true // Permite usar obj.valor
+});
+
+module.exports = i18n;
+
   locales: ['en', 'es'],
   defaultLocale: config.get('i18n.defaultLocale'),
   directory: path.join(__dirname, '..', 'locales'),
@@ -33,3 +48,4 @@ function i18nMiddleware(req, res, next) {
 }
 
 module.exports = { i18n, i18nMiddleware };
+main

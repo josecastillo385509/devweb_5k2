@@ -1,4 +1,12 @@
 {
+feat/automatized-jest-supertest
+  "mysql": {
+    "host": "localhost",
+    "port": 3306,
+    "database": "stride_co_test",
+    "user": "root",
+    "password": "password"
+
   "server": {
     "port": 3000
   },
@@ -26,5 +34,6 @@
   },
   "i18n": {
     "defaultLocale": "en"
+ main
   }
 }

@@ -56,7 +56,11 @@ async function destroy(req, res) {
     const id = req.params.id;
     const role = await Role.findByPk(id);
     if(!role) return res.status(404).json({
+feat/automatized-jest-supertest
+        message: "role not found"
+
         message: req.__('roles.notFound')
+main
     });
     await role.destroy();
     res.json({

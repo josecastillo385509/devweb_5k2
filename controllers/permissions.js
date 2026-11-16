@@ -34,7 +34,11 @@ async function find(req, res) {
 async function update(req, res) {
     const id = req.params.id;
     const permission = await Permission.findByPk(id);
+ feat/automatized-jest-supertest
+    if(!permission) return res.status(404).json({ message: "permission not found" });
+
     if(!permission) return res.status(404).json({ message: req.__('permissions.notFound') });
+main
     const key = req.body.key;
     const description = req.body.description;
     let changes = {};
@@ -51,7 +55,11 @@ async function update(req, res) {
 async function destroy(req, res) {
     const id = req.params.id;
     const permission = await Permission.findByPk(id);
+feat/automatized-jest-supertest
+    if(!permission) return res.status(404).json({ message: "permission not found "});
+
     if(!permission) return res.status(404).json({ message: req.__('permissions.notFound') });
+main
     await permission.destroy();
     res.json({
         message: req.__('permissions.deleted'),

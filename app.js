@@ -4,7 +4,11 @@ const path = require('path');
 const fs = require('fs');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
+feat/automatized-jest-supertest
+const i18n = require('./config/i18n');
+
 const { i18nMiddleware } = require('./config/i18n');
+main
 
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
@@ -28,14 +32,20 @@ const logDir = path.join(__dirname, 'logs');
 fs.mkdirSync(logDir, {recursive: true});
 const accessLogStream = fs.createWriteStream(path.join(logDir, 'access.log'), {flags: 'a'});
 
+feat/automatized-jest-supertest
+app.use(logger('combined', { stream: accessLogStream, skip: function() { return process.env.NODE_ENV === 'test'; } }));
+app.use(logger('dev', { skip: function() { return process.env.NODE_ENV === 'test'; } }));
+
 const isTest = process.env.NODE_ENV === 'test';
 app.use(logger('dev', { skip: () => isTest }));
 app.use(logger('combined', { stream: accessLogStream, skip: () => isTest }));
+main
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(i18nMiddleware);
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(i18n.init);
 
 app.use('/', indexRouter);
 app.use('/api/auth', authRouter);

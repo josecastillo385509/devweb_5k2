@@ -3,9 +3,13 @@ const app = require('../../app');
 const { resetDatabase, bearer } = require('./rbac-db');
 
 /**
+feat/automatized-jest-supertest
+ * Batería de pruebas CRUD para un recurso.
+
  * Batería de pruebas CRUD de un recurso, ejecutada como ADMIN (todos los endpoints están
  * protegidos con authenticate + authorize; la matriz por rol se prueba en test/rbac/).
  *
+ main
  * @param {string} resource  nombre del recurso (p. ej. 'users')
  * @param {object} [options]
  * @param {(users) => Promise<string>} [options.seed]  crea un registro existente y devuelve su id
@@ -50,9 +54,23 @@ function describeCrud(resource, options = {}) {
       expect(res.body).toHaveProperty('data');
     });
 
-    //CREATE
+    // CREATE
     test('POST / responde 201 con { message, data }', async () => {
+feat/automatized-jest-supertest
+      const payload = {
+        example: 'value',
+        name: 'Test',
+        lastName: 'User',
+        email: 'test@example.com',
+        password: 'Password123!',
+        key: 'test_key',
+        description: 'Test description',
+        userID: 1,
+      };
+      const res = await request(app).post(base).send(payload);
+
       const res = await request(app).post(base).set(auth).send(createBody);
+ main
       expect(res.status).toBe(201);
       expect(typeof res.body.message).toBe('string');
       expect(res.body).toHaveProperty('data');

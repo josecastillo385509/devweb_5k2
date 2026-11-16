@@ -38,8 +38,13 @@ async function mine(req, res) {
 
 // UPDATE
 async function update(req, res) {
+feat/automatized-jest-supertest
+  const customer = await Customer.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true  });
+  if(!customer) return res.status(404).json({message: 'Customer not found'});
+
   const customer = await Customer.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
   if(!customer) return res.status(404).json({ message: req.__('customers.notFound') });
+ main
   res.status(200).json({
     message: req.__('customers.updated'),
     data: customer
@@ -49,7 +54,11 @@ async function update(req, res) {
 // DELETE
 async function destroy(req, res) {
   const customer = await Customer.findByIdAndDelete(req.params.id);
+ feat/automatized-jest-supertest
+  if(!customer) return res.status(404).json({message: 'Customer not found'});
+
   if(!customer) return res.status(404).json({ message: req.__('customers.notFound') });
+main
   res.status(200).json({
     message: req.__('customers.deleted'),
     data: { id: customer._id }
