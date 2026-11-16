@@ -1,8 +1,9 @@
+const config = require('config');
 const bcrypt = require('bcrypt');
 
-// Factor de costo de bcrypt: BCRYPT_SALT_ROUNDS en .env (10 por defecto)
+// Factor de costo de bcrypt leído desde config
 function getSaltRounds() {
-    return Number(process.env.BCRYPT_SALT_ROUNDS) || 10;
+    return config.get('bcrypt.saltRounds');
 }
 
 // Genera un salt nuevo (saltKey) y el hash de la contraseña (securePassword).

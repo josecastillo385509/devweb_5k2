@@ -5,3 +5,7 @@ npm-debug.log
 .env
 logs
 docker-compose.yml
+
+# secretos de config/ (no van en la imagen)
+config/local*.json
+!config/local*.example.json

@@ -1,4 +1,3 @@
-require('dotenv').config({ quiet: true });
 const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
@@ -29,8 +28,9 @@ const logDir = path.join(__dirname, 'logs');
 fs.mkdirSync(logDir, {recursive: true});
 const accessLogStream = fs.createWriteStream(path.join(logDir, 'access.log'), {flags: 'a'});
 
-app.use(logger('dev', { skip: function() { return process.env.NODE_ENV === 'test'; } }));
-app.use(logger('combined', { stream: accessLogStream, skip: function() { return process.env.NODE_ENV === 'test'; } }));
+const isTest = process.env.NODE_ENV === 'test';
+app.use(logger('dev', { skip: () => isTest }));
+app.use(logger('combined', { stream: accessLogStream, skip: () => isTest }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());

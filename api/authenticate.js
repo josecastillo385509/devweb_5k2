@@ -1,18 +1,17 @@
 // Middleware de autenticación.
 // Procesa el header "Authorization: Bearer <token>", verifica el JWT con express-jwt
 // y deja al usuario autenticado en req.user.
+const config = require('config');
 const { expressjwt } = require('express-jwt');
 const { User } = require('../models/relationals');
 
 // Verifica firma, expiración, issuer y audience. El payload queda en req.auth.
-// Se construye por solicitud para leer las variables de entorno ya cargadas;
-// si falta JWT_SECRET la solicitud falla, nunca se deja pasar sin verificar.
 function verifyToken(req, res, next) {
   return expressjwt({
-    secret: process.env.JWT_SECRET,
-    algorithms: ['HS256'],
-    issuer: process.env.JWT_ISSUER,
-    audience: process.env.JWT_AUDIENCE,
+    secret: config.get('jwt.secret'),
+    algorithms: [config.get('jwt.algorithm')],
+    issuer: config.get('jwt.issuer'),
+    audience: config.get('jwt.audience'),
   })(req, res, next);
 }
 

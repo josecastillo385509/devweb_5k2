@@ -3,6 +3,7 @@
 //   Role -> Role_Permission -> Permission  ==>  grants  ==>  AccessControl
 //
 // La base de datos es la ÚNICA fuente de verdad: aquí no hay roles ni permisos escritos en código.
+const config = require('config');
 const debug = require('debug')('stride-co:rbac');
 const { AccessControl } = require('accesscontrol');
 const { Role, Permission } = require('../models/relationals');
@@ -11,8 +12,7 @@ const { parsePermissionKey } = require('./parse-permission');
 // Segundos que se conserva en memoria la configuración leída de la BD.
 // 0 = consultar la BD en cada solicitud (siempre refleja el último cambio).
 function getTtlMs() {
-  const raw = process.env.RBAC_CACHE_TTL_SECONDS;
-  const seconds = raw === undefined || raw === '' ? 10 : Number(raw);
+  const seconds = config.get('rbac.cacheTtlSeconds');
   return (Number.isFinite(seconds) && seconds >= 0 ? seconds : 10) * 1000;
 }
 

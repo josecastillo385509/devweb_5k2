@@ -65,7 +65,13 @@ describe('Configuración de AccessControl construida desde la BD', () => {
   });
 
   test('con TTL > 0 la configuración se conserva hasta invalidarla', async () => {
-    process.env.RBAC_CACHE_TTL_SECONDS = '60';
+    const config = require('config');
+    const proto = Object.getPrototypeOf(config);
+    const origGet = proto.get;
+    const spy = jest.spyOn(proto, 'get').mockImplementation(function (key) {
+      if (key === 'rbac.cacheTtlSeconds') return 60;
+      return origGet.call(this, key);
+    });
     try {
       invalidateAccessControl();
       const first = await getAccessControl();
@@ -73,7 +79,8 @@ describe('Configuración de AccessControl construida desde la BD', () => {
       invalidateAccessControl();
       expect(await getAccessControl()).not.toBe(first);
     } finally {
-      process.env.RBAC_CACHE_TTL_SECONDS = '0';
+      spy.mockRestore();
+      invalidateAccessControl();
     }
   });
 });

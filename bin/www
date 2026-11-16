@@ -4,17 +4,40 @@
  * Module dependencies.
  */
 
+const config = require('config');
+
+// --- Validación de secretos obligatorios al arranque ---
+// Si jwt.secret no está configurado, el servidor no debe arrancar.
+let jwtSecret = null;
+if (config.has('jwt.secret')) {
+  try {
+    jwtSecret = config.get('jwt.secret');
+  } catch {
+    jwtSecret = null;
+  }
+}
+if (!jwtSecret || String(jwtSecret).trim() === '') {
+  console.error(
+    '[ERROR] jwt.secret no está configurado.\n' +
+    '        Para desarrollo, copia config/local-development.example.json\n' +
+    '        como config/local-development.json y define un secreto real.\n' +
+    '        El servidor no puede arrancar sin este valor.'
+  );
+  process.exit(1);
+}
+
 const app = require('../app');
 const debug = require('debug')('stride-co:server');
 const http = require('http');
-const { sequelize } = require('../models/relationals')
+const { sequelize } = require('../models/relationals');
 const connectMongo = require('../config/mongoose');
 
 /**
- * Get port from environment and store in Express.
+ * Get port from config (linked to PORT env via custom-environment-variables.json)
+ * and store in Express.
  */
 
-const port = normalizePort(process.env.PORT || '3000');
+const port = normalizePort(config.get('server.port'));
 app.set('port', port);
 
 /**
@@ -23,14 +46,14 @@ app.set('port', port);
 
 const server = http.createServer(app);
 
-async function start(){
+async function start() {
   await sequelize.authenticate();
   // Crea las tablas si no existen
-  await sequelize.sync({alter:true});
-  debug('Conexión a MySQL generada correctamente.');
+  await sequelize.sync({ alter: true });
+  debug('Conexión a MySQL/Postgres generada correctamente.');
 
   await connectMongo();
-  debug('Conexión a MongoDB correcta')
+  debug('Conexión a MongoDB correcta');
   server.listen(port);
 }
 

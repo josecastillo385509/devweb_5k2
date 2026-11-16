@@ -1,0 +1,37 @@
+{
+  "server": {
+    "port": 3000
+  },
+  "jwt": {
+    "expiresIn": "15m",
+    "issuer": "stride-co",
+    "audience": "stride-co-api",
+    "algorithm": "HS256"
+  },
+  "bcrypt": {
+    "saltRounds": 10
+  },
+  "database": {
+    "sql": {
+      "dialect": "mysql",
+      "host": "localhost",
+      "port": 3306,
+      "name": "stride-co",
+      "user": "root"
+    },
+    "mongo": {
+      "uri": "mongodb://localhost:27017/stride_co"
+    }
+  },
+  "rbac": {
+    "cacheTtlSeconds": 10
+  },
+  "i18n": {
+    "defaultLocale": "en"
+  },
+  "seed": {
+    "demoUsers": true,
+    "mongo": true,
+    "password": "Passw0rd!"
+  }
+}
