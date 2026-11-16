@@ -1,5 +1,91 @@
 {
+feat/automatized-jest-supertest
     "auth": {
         "invalidCredentials": "Invalid Credentials"
     }
+
+  "products": {
+    "list": "Products retrieved",
+    "notFound": "Product not found",
+    "created": "Product created",
+    "find": "Product retrieved",
+    "updated": "Product updated",
+    "deleted": "Product deleted"
+  },
+  "variants": {
+    "list": "Variants retrieved",
+    "notFound": "Variant not found",
+    "created": "Variant created",
+    "find": "Variant retrieved",
+    "updated": "Variant updated",
+    "deleted": "Variant deleted"
+  },
+  "inventory": {
+    "list": "Inventory retrieved",
+    "notFound": "Inventory item not found",
+    "created": "Inventory item created",
+    "find": "Inventory item retrieved",
+    "updated": "Inventory item updated",
+    "deleted": "Inventory item deleted"
+  },
+  "customers": {
+    "list": "Customers retrieved",
+    "notFound": "Customer not found",
+    "created": "Customer created",
+    "find": "Customer retrieved",
+    "mine": "Own customers retrieved",
+    "updated": "Customer updated",
+    "deleted": "Customer deleted"
+  },
+  "orders": {
+    "list": "Orders retrieved",
+    "notFound": "Order not found",
+    "created": "Order created",
+    "find": "Order retrieved",
+    "mine": "Own orders retrieved",
+    "updated": "Order updated",
+    "deleted": "Order deleted"
+  },
+  "users": {
+    "list": "Users retrieved",
+    "notFound": "User not found",
+    "created": "User created",
+    "find": "User retrieved",
+    "updated": "User updated",
+    "deleted": "User deleted",
+    "passwordRequired": "Password is required"
+  },
+  "roles": {
+    "list": "Roles retrieved",
+    "notFound": "Role not found",
+    "created": "Role created",
+    "find": "Role retrieved",
+    "updated": "Role updated",
+    "deleted": "Role deleted"
+  },
+  "permissions": {
+    "list": "Permissions retrieved",
+    "notFound": "Permission not found",
+    "created": "Permission created",
+    "find": "Permission retrieved",
+    "updated": "Permission updated",
+    "deleted": "Permission deleted"
+  },
+  "auth": {
+    "loginSuccess": "Login successful",
+    "invalidCredentials": "Invalid credentials",
+    "requiredCredentials": "Email and password are required"
+  },
+  "errors": {
+    "unauthorized": "Unauthorized",
+    "forbidden": "Forbidden",
+    "notFound": "Not Found",
+    "internalError": "Internal Server Error",
+    "invalidId": "Invalid identifier"
+  },
+  "views": {
+    "homeTitle": "Home",
+    "welcome": "Welcome to %s"
+  }
+main
 }

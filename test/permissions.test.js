@@ -2,7 +2,9 @@ const request = require('supertest');
 const app = require('../app');
 const Permission = require('../models/relationals/Permission');
 const { describeCrud } = require('./helpers/crud-suite');
+const { Permission } = require('./helpers/rbac-db');
 
+ feat/automatized-jest-supertest
 describeCrud('permissions');
 
 describe('API /api/permissions casos específicos', () => {
@@ -25,4 +27,9 @@ describe('API /api/permissions casos específicos', () => {
     expect(res.status).toBe(404);
     expect(res.body.message).toContain('permission not found');
   });
+
+describeCrud('permissions', {
+  seed: async () => String((await Permission.create({ key: 'spare:read:any', description: 'spare' })).id),
+  createBody: { key: 'nuevo:read:any', description: 'permiso de prueba' },
+main
 });

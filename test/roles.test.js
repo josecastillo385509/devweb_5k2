@@ -2,7 +2,9 @@ const request = require('supertest');
 const app = require('../app');
 const Role = require('../models/relationals/Role');
 const { describeCrud } = require('./helpers/crud-suite');
+const { Role } = require('./helpers/rbac-db');
 
+ feat/automatized-jest-supertest
 describeCrud('roles');
 
 describe('API /api/roles casos específicos', () => {
@@ -25,4 +27,9 @@ describe('API /api/roles casos específicos', () => {
     expect(res.status).toBe(404);
     expect(res.body.message).toBe('role not found');
   });
+
+describeCrud('roles', {
+  seed: async () => String((await Role.create({ name: 'spare', description: 'spare' })).id),
+  createBody: { name: 'nuevo-rol', description: 'rol de prueba' },
+ main
 });

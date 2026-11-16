@@ -1,3 +1,11 @@
 node_modules
 .env
+feat/automatized-jest-supertest
 coverage
+
+logs
+
+# secretos de config/ (nunca van en el repositorio)
+config/local*.json
+!config/local*.example.json
+main

@@ -1,0 +1,85 @@
+# Stride & Co. - MySQL (usuarios, roles, permisos y matriz RBAC) + MongoDB (clientes y órdenes) + API.
+#
+#   docker compose up -d --build                  -> bases de datos + API
+#   docker compose --profile seed run --rm seed   -> carga la matriz RBAC y los datos de demostración
+#
+# Las variables se leen del archivo .env (ver .env.example); todas tienen un valor por defecto.
+
+x-api-env: &api-env
+  NODE_ENV: production
+  PORT: 3000
+  DB_HOST: mysql                       # nombre del servicio, no "localhost"
+  DB_PORT: 3306
+  DB_NAME: ${DB_NAME:-stride-co}
+  DB_USER: root
+  DB_PASSWORD: ${DB_PASSWORD:-abcd1234}
+  MONGO_URI: mongodb://mongo:27017/stride_co
+  JWT_SECRET: ${JWT_SECRET:-}
+  JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-15m}
+  JWT_ISSUER: ${JWT_ISSUER:-stride-co}
+  JWT_AUDIENCE: ${JWT_AUDIENCE:-stride-co-api}
+  BCRYPT_SALT_ROUNDS: ${BCRYPT_SALT_ROUNDS:-10}
+  RBAC_CACHE_TTL_SECONDS: ${RBAC_CACHE_TTL_SECONDS:-10}
+  SEED_PASSWORD: ${SEED_PASSWORD:-Passw0rd!}
+
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: stride-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-abcd1234}
+      MYSQL_DATABASE: ${DB_NAME:-stride-co}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  mongo:
+    image: mongo:7
+    container_name: stride-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  api:
+    build: .
+    container_name: stride-api
+    restart: unless-stopped
+    environment: *api-env
+    ports:
+      - "3000:3000"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+
+  # Carga roles, permisos y la matriz RBAC (tablas roles, permissions y role_permissions).
+  # Solo se ejecuta cuando se pide explícitamente: docker compose --profile seed run --rm seed
+  seed:
+    build: .
+    profiles: ["seed"]
+    command: ["npm", "run", "seed"]
+    environment: *api-env
+    depends_on:
+      mysql:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+
+volumes:
+  mysql_data:
+  mongo_data:

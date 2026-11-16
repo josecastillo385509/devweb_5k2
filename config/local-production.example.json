@@ -1,0 +1,16 @@
+{
+  "jwt": {
+    "secret": "REEMPLAZAR_CON_SECRETO_REAL_MINIMO_32_CARACTERES"
+  },
+  "database": {
+    "sql": {
+      "user": "USUARIO_POSTGRES",
+      "password": "PASSWORD_POSTGRES",
+      "name": "stride_co_prod",
+      "host": "HOST_DE_PRODUCCION"
+    },
+    "mongo": {
+      "uri": "mongodb+srv://USUARIO:PASSWORD@CLUSTER/stride_co?retryWrites=true&w=majority"
+    }
+  }
+}

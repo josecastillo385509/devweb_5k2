@@ -1,4 +1,5 @@
 {
+ feat/automatized-jest-supertest
     "mysql": {
         "host": "localhost",
         "port": 3306,
@@ -7,3 +8,16 @@
         "password": "abcd1234"
     }
 }
+
+  "database": {
+    "sql": {
+      "dialect": "postgres",
+      "port": 5432,
+      "ssl": {
+        "require": true,
+        "rejectUnauthorized": false
+      }
+    }
+  }
+}
+ main

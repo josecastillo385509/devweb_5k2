@@ -1,9 +1,39 @@
 {
+feat/automatized-jest-supertest
   "mysql": {
     "host": "localhost",
     "port": 3306,
     "database": "stride_co_test",
     "user": "root",
     "password": "password"
+
+  "server": {
+    "port": 3000
+  },
+  "jwt": {
+    "secret": "test-secret-only-for-jest",
+    "expiresIn": "15m",
+    "issuer": "stride-co",
+    "audience": "stride-co-api",
+    "algorithm": "HS256"
+  },
+  "bcrypt": {
+    "saltRounds": 4
+  },
+  "database": {
+    "sql": {
+      "dialect": "sqlite",
+      "storage": ":memory:"
+    },
+    "mongo": {
+      "uri": "mongodb://localhost:27017/stride_co_test"
+    }
+  },
+  "rbac": {
+    "cacheTtlSeconds": 0
+  },
+  "i18n": {
+    "defaultLocale": "en"
+ main
   }
 }
